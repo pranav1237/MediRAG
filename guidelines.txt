@@ -1,0 +1,9 @@
+WHO HYPERTENSION PROTOCOL 2026
+SECTION 1: CLINICAL CLASSIFICATION
+Blood pressure levels are categorized into Normal, Prehypertension, Stage 1 Hypertension, and Stage 2 Hypertension.
+Stage 1 Hypertension is defined as systolic blood pressure between 130-139 mmHg or diastolic blood pressure between 80-89 mmHg.
+
+SECTION 2: FIRST-LINE INTERVENTION PROTOCOLS
+For adults with Stage 1 Hypertension, the recommended first-line intervention is standard supportive therapy, including diet and sodium reduction, physical exercise, and vital sign monitoring every 4 hours.
+Pharmacological interventions should be initiated if blood pressure targets are not met after 3 months of lifestyle modifications, starting with low-dose thiazide-type diuretics.
+If patient criteria escalate beyond baseline thresholds, consult the senior clinical registrar immediately.
