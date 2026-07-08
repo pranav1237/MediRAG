@@ -62,7 +62,7 @@ export default function AnalyticsView({ apiBaseUrl, token }: AnalyticsViewProps)
           if (q.feedbacks && q.feedbacks.length > 0) {
             const fb = q.feedbacks[0];
             if (fb.score === 1) upvotes += 1;
-            if (fb.score === -1) downvotes += 1;
+            if (fb.score === 0) downvotes += 1;
           }
         });
 

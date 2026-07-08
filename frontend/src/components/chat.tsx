@@ -434,14 +434,14 @@ export default function ChatView({
                               title="Helpful Answer"
                             >
                               <ThumbsUp className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleFeedback(msg.id, msg.queryId!, -1)}
-                              className="p-1 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-800 rounded transition-colors cursor-pointer"
-                              title="Unhelpful or Hallucinated Answer"
-                            >
-                              <ThumbsDown className="w-3.5 h-3.5" />
-                            </button>
+                             </button>
+                             <button
+                               onClick={() => handleFeedback(msg.id, msg.queryId!, 0)}
+                                className="p-1 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-800 rounded transition-colors cursor-pointer"
+                                title="Unhelpful or Hallucinated Answer"
+                              >
+                                <ThumbsDown className="w-3.5 h-3.5" />
+                              </button>
                           </div>
                         )}
                       </div>
@@ -449,7 +449,7 @@ export default function ChatView({
                   </div>
 
                   {/* Feedback comments input area if thumbs-down clicked */}
-                  {feedbackMessageId === msg.id && feedbackScore === -1 && (
+                  {feedbackMessageId === msg.id && feedbackScore === 0 && (
                     <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 dark:bg-slate-950 dark:border-slate-800">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">
                         Why was this answer unhelpful?
@@ -469,7 +469,7 @@ export default function ChatView({
                           Cancel
                         </button>
                         <button
-                          onClick={() => submitFeedbackAPI(msg.queryId!, -1, feedbackComment)}
+                          onClick={() => submitFeedbackAPI(msg.queryId!, 0, feedbackComment)}
                           className="px-2 py-1 text-[10px] bg-brand text-brand-text hover:bg-brand-hover rounded transition-colors cursor-pointer"
                         >
                           Submit Review

@@ -59,19 +59,69 @@ class LLMService:
                     models = None
 
             if models is not None:
-                # Return a short summary to avoid large payloads
-                summary = []
-                for m in (models[:10] if isinstance(models, list) else getattr(models, 'models', [])[:10]):
+                # Normalize to an iterable of model-like items
+                items = None
+                if isinstance(models, list):
+                    items = models
+                elif hasattr(models, 'models'):
                     try:
-                        name = getattr(m, 'name', str(m))
+                        items = list(models.models)
                     except Exception:
-                        name = str(m)
+                        items = list(getattr(models, 'models', []))
+                elif isinstance(models, dict) and 'models' in models:
+                    items = models.get('models')
+                elif isinstance(models, dict) and 'data' in models:
+                    items = models.get('data')
+                else:
+                    # Try to iterate
+                    try:
+                        items = list(models)
+                    except Exception:
+                        items = []
+
+                summary = []
+                for m in (items[:10] if isinstance(items, list) else []):
+                    # support dict-like and object-like items
+                    name = None
+                    if isinstance(m, dict):
+                        name = m.get('name') or m.get('id') or str(m)
+                    else:
+                        name = getattr(m, 'name', None) or getattr(m, 'id', None) or str(m)
                     summary.append(name)
+
                 return {"ok": True, "models_preview": summary}
 
             return {"ok": False, "reason": "Could not list models with available SDK"}
         except Exception as e:
             logger.error(f"LLM validation failed: {e}")
+            return {"ok": False, "reason": str(e)}
+
+    def reload(self):
+        """Reload API key from settings and (re)initialize the Gemini client.
+
+        Useful when `.env` is updated at runtime and the server cannot be
+        restarted immediately. Returns a dict describing the new mode.
+        """
+        self.api_key = settings.GEMINI_API_KEY
+        self.use_mock = not self.api_key or genai is None or types is None
+        self.client = None
+
+        if self.use_mock:
+            if not self.api_key:
+                logger.warning("GEMINI_API_KEY is not set after reload. Staying in MOCK MODE.")
+            else:
+                logger.warning("GenAI SDK missing after reload. Staying in MOCK MODE.")
+            return {"ok": False, "reason": "MOCK_MODE or missing SDK or API key"}
+
+        try:
+            self.client = genai.Client(api_key=self.api_key)
+            self.use_mock = False
+            logger.info("Gemini client re-initialized after reload.")
+            return {"ok": True, "message": "Gemini client initialized"}
+        except Exception as e:
+            logger.error(f"Failed to initialize Gemini client during reload: {e}")
+            self.use_mock = True
+            self.client = None
             return {"ok": False, "reason": str(e)}
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
@@ -87,7 +137,8 @@ class LLMService:
             # Embed content using the new SDK
             response = self.client.models.embed_content(
                 model=settings.EMBEDDING_MODEL,
-                contents=texts
+                contents=texts,
+                config=types.EmbedContentConfig(outputDimensionality=768)
             )
             # The API returns a list of embeddings with `values`
             if hasattr(response, "embeddings") and response.embeddings:
